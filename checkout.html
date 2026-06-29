@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Оплата — Пекарня</title>
+<script src="https://js.stripe.com/v3/"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -17,7 +18,6 @@
   --error: #DF1B41;
   --success: #0E6245;
   --white: #fff;
-  --card-bg: #fff;
   --radius: 8px;
 }
 
@@ -32,7 +32,6 @@ body {
   color: var(--text);
 }
 
-/* ── Container ── */
 .checkout {
   background: var(--white);
   width: 100%;
@@ -44,146 +43,84 @@ body {
   overflow: hidden;
 }
 
-/* ── Form Side ── */
-.form-side {
-  padding: 40px;
-}
-
+.form-side { padding: 40px; }
 .logo {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--stripe);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 32px;
+  font-size: 14px; font-weight: 700; color: var(--stripe);
+  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 32px;
 }
-
 .step { font-size: 13px; color: var(--subtext); margin-bottom: 4px; }
 h2 { font-size: 22px; font-weight: 600; margin-bottom: 24px; }
 
-/* ── Fields ── */
 .field { margin-bottom: 20px; }
 .field label {
-  display: block;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--subtext);
-  text-transform: uppercase;
-  margin-bottom: 6px;
+  display: block; font-size: 12px; font-weight: 600;
+  color: var(--subtext); text-transform: uppercase; margin-bottom: 6px;
 }
 .field input {
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  font-size: 16px;
-  font-family: inherit;
-  transition: border 0.15s, box-shadow 0.15s;
-  outline: none;
+  width: 100%; padding: 12px 14px; border: 1px solid var(--border);
+  border-radius: var(--radius); font-size: 16px; font-family: inherit;
+  transition: border 0.15s, box-shadow 0.15s; outline: none;
 }
 .field input:focus {
   border-color: var(--stripe);
   box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.15);
 }
 .field input.error-input { border-color: var(--error); }
-
 .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
-/* ── Card Preview ── */
-.card-preview {
-  background: linear-gradient(135deg, #434343 0%, #1a1a1a 100%);
-  border-radius: 12px;
-  padding: 20px 24px;
-  color: #fff;
-  margin-bottom: 24px;
-  position: relative;
-  overflow: hidden;
-  min-height: 160px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-}
-.card-preview::after {
-  content: '';
-  position: absolute;
-  top: -40px; right: -40px;
-  width: 120px; height: 120px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.05);
-}
-.chip { font-size: 32px; margin-bottom: 16px; }
-.card-number-display {
-  font-family: 'Courier New', monospace;
-  font-size: 22px;
-  letter-spacing: 3px;
-  margin-bottom: 16px;
-  word-spacing: 8px;
-}
-.card-details-display {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: rgba(255,255,255,0.7);
-}
-.card-label { font-size: 9px; display: block; margin-bottom: 2px; }
-.card-value { font-size: 14px; color: #fff; }
-
-/* ── Button ── */
-.btn {
-  width: 100%;
-  padding: 15px 24px;
-  background: var(--stripe);
-  color: #fff;
-  border: none;
+/* Stripe Card Element */
+#card-element {
+  padding: 14px 14px;
+  border: 1px solid var(--border);
   border-radius: var(--radius);
-  font-size: 17px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.15s;
-  margin-top: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  background: var(--white);
+  transition: border 0.15s, box-shadow 0.15s;
+  min-height: 48px;
+}
+#card-element.StripeElement--focus {
+  border-color: var(--stripe);
+  box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.15);
+}
+#card-element.StripeElement--invalid { border-color: var(--error); }
+#card-errors {
+  color: var(--error); font-size: 13px; margin-top: 6px; min-height: 20px;
+}
+
+.btn {
+  width: 100%; padding: 15px 24px; background: var(--stripe);
+  color: #fff; border: none; border-radius: var(--radius);
+  font-size: 17px; font-weight: 600; font-family: inherit;
+  cursor: pointer; transition: all 0.15s; margin-top: 8px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
 }
 .btn:hover { background: var(--stripe-hover); transform: translateY(-1px); }
 .btn:active { transform: translateY(0); }
-.btn:disabled {
-  background: #A5ACB8;
-  cursor: not-allowed;
-  transform: none;
-}
+.btn:disabled { background: #A5ACB8; cursor: not-allowed; transform: none; }
 .btn .spinner {
-  width: 20px; height: 20px;
-  border: 2px solid rgba(255,255,255,0.3);
-  border-top-color: #fff;
-  border-radius: 50%;
+  width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff; border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-.btn-icon { font-size: 20px; }
+.test-card-hint {
+  font-size: 11px; color: var(--subtext); margin-top: 12px;
+  text-align: center; line-height: 1.4;
+}
+.test-card-hint code {
+  background: var(--stripe-light); padding: 1px 5px;
+  border-radius: 3px; font-size: 11px;
+}
 
-/* ── Summary Side ── */
+/* Summary Side */
 .summary-side {
-  background: var(--stripe-light);
-  padding: 40px 28px;
+  background: var(--stripe-light); padding: 40px 28px;
   border-left: 1px solid var(--border);
 }
-
-.summary-side h3 {
-  font-size: 15px;
-  font-weight: 600;
-  margin-bottom: 24px;
-}
-
+.summary-side h3 { font-size: 15px; font-weight: 600; margin-bottom: 24px; }
 .item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
 }
 .item:last-of-type { border-bottom: none; }
 .item-emoji { font-size: 28px; }
@@ -193,112 +130,70 @@ h2 { font-size: 22px; font-weight: 600; margin-bottom: 24px; }
 .item-price { font-size: 14px; font-weight: 600; }
 
 .total-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 20px;
-  padding-top: 20px;
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 20px; padding-top: 20px;
   border-top: 2px solid var(--border);
 }
 .total-label { font-size: 15px; font-weight: 600; }
 .total-price { font-size: 22px; font-weight: 700; color: var(--stripe); }
-
 .powered-by {
-  margin-top: 32px;
-  font-size: 11px;
-  color: var(--subtext);
-  text-align: center;
+  margin-top: 32px; font-size: 11px; color: var(--subtext); text-align: center;
 }
 .powered-by span { color: var(--stripe); font-weight: 700; }
 
-/* ── Success Overlay ── */
+/* Success Overlay */
 .overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  animation: fadeIn 0.3s;
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100; animation: fadeIn 0.3s;
 }
 @keyframes fadeIn { from { opacity: 0; } }
-
 .success-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 48px 40px;
-  text-align: center;
-  max-width: 420px;
-  width: 90%;
+  background: #fff; border-radius: 16px; padding: 48px 40px;
+  text-align: center; max-width: 420px; width: 90%;
   animation: scaleIn 0.4s cubic-bezier(0, 1, 0.5, 1.3);
 }
 @keyframes scaleIn { from { transform: scale(0.8); opacity: 0; } }
-
 .success-icon {
-  width: 72px; height: 72px;
-  background: #E1F7E9;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px;
-  font-size: 36px;
+  width: 72px; height: 72px; background: #E1F7E9;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px; font-size: 36px;
 }
 .success-card h2 { margin-bottom: 8px; }
 .success-card p { color: var(--subtext); margin-bottom: 24px; line-height: 1.5; }
 .success-card .btn { max-width: 260px; margin: 0 auto; }
 
-.confetti {
-  position: fixed; inset: 0; pointer-events: none; z-index: 101;
+/* Error Overlay */
+.error-icon {
+  width: 72px; height: 72px; background: #FDE8E8;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px; font-size: 36px;
 }
 
-/* ── Mobile ── */
+.confetti { position: fixed; inset: 0; pointer-events: none; z-index: 101; }
+
+.hidden { display: none !important; }
+
+/* Mobile */
 @media (max-width: 700px) {
-  .checkout {
-    grid-template-columns: 1fr;
-    max-width: 100%;
-  }
+  .checkout { grid-template-columns: 1fr; max-width: 100%; }
   .summary-side {
-    border-left: none;
-    border-top: 1px solid var(--border);
+    border-left: none; border-top: 1px solid var(--border);
     padding: 28px 24px;
   }
   .form-side { padding: 28px 24px; }
   .row { grid-template-columns: 1fr; }
-  .card-number-display { font-size: 18px; letter-spacing: 2px; }
 }
-
-/* ── Hidden ── */
-.hidden { display: none !important; }
 </style>
 </head>
 <body>
 
 <div class="checkout" id="checkout">
-  <!-- Форма -->
   <div class="form-side">
     <div class="logo">🥖 Пекарня</div>
     <div class="step">Крок 2 з 2</div>
     <h2>Дані картки</h2>
 
-    <!-- Картка -->
-    <div class="card-preview">
-      <div class="chip">💳</div>
-      <div class="card-number-display" id="cardDisplay">•••• •••• •••• ••••</div>
-      <div class="card-details-display">
-        <div>
-          <span class="card-label">Термін дії</span>
-          <div class="card-value" id="expiryDisplay">MM / PP</div>
-        </div>
-        <div>
-          <span class="card-label">CVC</span>
-          <div class="card-value" id="cvcDisplay">•••</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Поля -->
     <div class="field">
       <label>Ім'я та прізвище</label>
       <input type="text" id="name" placeholder="Тарас Шевченко" autocomplete="cc-name">
@@ -309,31 +204,24 @@ h2 { font-size: 22px; font-weight: 600; margin-bottom: 24px; }
     </div>
     <div class="field">
       <label>Номер картки</label>
-      <input type="text" id="cardNumber" placeholder="4242 4242 4242 4242"
-             maxlength="19" inputmode="numeric" autocomplete="cc-number">
-    </div>
-    <div class="row">
-      <div class="field">
-        <label>Місяць / Рік</label>
-        <input type="text" id="expiry" placeholder="ММ / РР" maxlength="7" inputmode="numeric" autocomplete="cc-exp">
-      </div>
-      <div class="field">
-        <label>CVC</label>
-        <input type="text" id="cvc" placeholder="123" maxlength="4" inputmode="numeric" autocomplete="cc-csc">
-      </div>
+      <div id="card-element"></div>
+      <div id="card-errors"></div>
     </div>
     <div class="field">
       <label>Телефон</label>
       <input type="tel" id="phone" placeholder="+380 50 123 45 67" autocomplete="tel">
     </div>
 
-    <button class="btn" id="payBtn" onclick="processPayment()">
-      <span class="btn-icon">🔒</span>
-      Сплатити <span id="totalBtn">0 грн</span>
+    <button class="btn" id="payBtn">
+      <span>🔒</span> Сплатити <span id="totalBtn">0 грн</span>
     </button>
+
+    <div class="test-card-hint">
+      💡 Тестова картка: <code>4242 4242 4242 4242</code><br>
+      Будь-які CVC і термін дії в майбутньому
+    </div>
   </div>
 
-  <!-- Кошик -->
   <div class="summary-side" id="summarySide">
     <h3>Ваше замовлення</h3>
     <div id="itemsList"></div>
@@ -342,36 +230,85 @@ h2 { font-size: 22px; font-weight: 600; margin-bottom: 24px; }
       <span class="total-price" id="totalPrice">0 грн</span>
     </div>
     <div class="powered-by">
-      Тестовий режим &nbsp;•&nbsp; Powered by <span>🥖 Пекарня</span>
+      Тестовий режим &nbsp;•&nbsp; Powered by <span>Stripe</span>
     </div>
   </div>
 </div>
 
-<!-- Оверлей успіху -->
+<!-- Success Overlay -->
 <div class="overlay hidden" id="successOverlay">
   <div class="success-card">
     <div class="success-icon">✅</div>
     <h2>Оплата успішна!</h2>
-    <p id="successMsg">Дякуємо за замовлення!<br>Ми зв'яжемося з вами найближчим часом.</p>
+    <p id="successMsg"></p>
     <button class="btn" onclick="goBack()">На головну</button>
+  </div>
+</div>
+
+<!-- Error Overlay -->
+<div class="overlay hidden" id="errorOverlay">
+  <div class="success-card">
+    <div class="error-icon">❌</div>
+    <h2>Помилка оплати</h2>
+    <p id="errorMsg"></p>
+    <button class="btn" onclick="closeError()">Спробувати ще раз</button>
   </div>
 </div>
 
 <canvas class="confetti hidden" id="confetti"></canvas>
 
 <script>
-// ── Отримати товари з URL ──
+// ── Ініціалізація ──
+let stripe, card;
+
+async function init() {
+  // 1. Отримуємо публічний ключ
+  const configRes = await fetch('/api/config');
+  const config = await configRes.json();
+
+  if (!config.publishableKey) {
+    showErrorPage('❌ Публічний ключ Stripe не налаштовано.<br>Додайте STRIPE_PUBLISHABLE_KEY у Vercel Environment Variables.');
+    return;
+  }
+
+  stripe = Stripe(config.publishableKey);
+  const elements = stripe.elements();
+
+  card = elements.create('card', {
+    style: {
+      base: {
+        fontSize: '16px',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        color: '#1A1F36',
+        '::placeholder': { color: '#A5ACB8' },
+      },
+      invalid: {
+        color: '#DF1B41',
+        iconColor: '#DF1B41',
+      },
+    },
+  });
+  card.mount('#card-element');
+
+  card.on('change', (event) => {
+    document.getElementById('card-errors').textContent = event.error ? event.error.message : '';
+  });
+
+  // 2. Рендеримо кошик
+  renderCart();
+  updateTotals();
+}
+
+// ── Кошик ──
 const params = new URLSearchParams(window.location.search);
-const itemsParam = params.get('items');
 let cartItems = [];
+let total = 0;
 
 try {
-  if (itemsParam) {
-    cartItems = JSON.parse(decodeURIComponent(itemsParam));
-  }
+  const raw = params.get('items');
+  if (raw) cartItems = JSON.parse(decodeURIComponent(raw));
 } catch(e) {}
 
-// Дефолтний товар якщо нічого не передано
 if (!cartItems.length) {
   cartItems = [
     { name: 'Хліб пшеничний', qty: 1, price: 45, emoji: '🍞' },
@@ -379,121 +316,130 @@ if (!cartItems.length) {
   ];
 }
 
-// ── Рендер кошика ──
-const itemsList = document.getElementById('itemsList');
-const totalPrice = document.getElementById('totalPrice');
-const totalBtn = document.getElementById('totalBtn');
-
-let total = 0;
-cartItems.forEach(item => {
-  const subtotal = item.price * item.qty;
-  total += subtotal;
-  const div = document.createElement('div');
-  div.className = 'item';
-  div.innerHTML = `
-    <span class="item-emoji">${item.emoji || '📦'}</span>
-    <span class="item-info">
-      <span class="item-name">${item.name}</span>
-      <span class="item-qty">${item.qty} × ${item.price} грн</span>
-    </span>
-    <span class="item-price">${subtotal} грн</span>
-  `;
-  itemsList.appendChild(div);
-});
-
-totalPrice.textContent = total + ' грн';
-totalBtn.textContent = total + ' грн';
-
-// ── Маска номера картки ──
-const cardInput = document.getElementById('cardNumber');
-const cardDisplay = document.getElementById('cardDisplay');
-const expiryInput = document.getElementById('expiry');
-const expiryDisplay = document.getElementById('expiryDisplay');
-const cvcInput = document.getElementById('cvc');
-const cvcDisplay = document.getElementById('cvcDisplay');
-
-cardInput.addEventListener('input', () => {
-  let val = cardInput.value.replace(/\D/g, '');
-  if (val.length > 16) val = val.slice(0, 16);
-  cardInput.value = val.replace(/(.{4})/g, '$1 ').trim();
-
-  // Оновлення прев'ю
-  let display = val.padEnd(16, '•');
-  cardDisplay.textContent = display.replace(/(.{4})/g, '$1 ').trim();
-});
-
-expiryInput.addEventListener('input', () => {
-  let val = expiryInput.value.replace(/\D/g, '');
-  if (val.length > 4) val = val.slice(0, 4);
-  if (val.length >= 2) {
-    expiryInput.value = val.slice(0,2) + ' / ' + val.slice(2);
-  } else {
-    expiryInput.value = val;
-  }
-  expiryDisplay.textContent = expiryInput.value || 'MM / PP';
-});
-
-cvcInput.addEventListener('input', () => {
-  let val = cvcInput.value.replace(/\D/g, '');
-  if (val.length > 4) val = val.slice(0, 4);
-  cvcInput.value = val;
-  cvcDisplay.textContent = val ? '•'.repeat(val.length) : '•••';
-});
-
-// ── Валідація ──
-function showError(id, msg) {
-  const el = document.getElementById(id);
-  el.classList.add('error-input');
-  el.placeholder = msg;
-  el.value = '';
+function renderCart() {
+  const el = document.getElementById('itemsList');
+  total = 0;
+  el.innerHTML = cartItems.map(item => {
+    const subtotal = item.price * item.qty;
+    total += subtotal;
+    return `
+      <div class="item">
+        <span class="item-emoji">${item.emoji || '📦'}</span>
+        <span class="item-info">
+          <span class="item-name">${item.name}</span>
+          <span class="item-qty">${item.qty} × ${item.price} грн</span>
+        </span>
+        <span class="item-price">${subtotal} грн</span>
+      </div>`;
+  }).join('');
 }
 
-function clearError(id) {
-  const el = document.getElementById(id);
-  el.classList.remove('error-input');
+function updateTotals() {
+  document.getElementById('totalPrice').textContent = total + ' грн';
+  document.getElementById('totalBtn').textContent = total + ' грн';
 }
 
-['cardNumber', 'expiry', 'cvc', 'name', 'email'].forEach(clearError);
+// ── Оплата ──
+const payBtn = document.getElementById('payBtn');
 
-// ── Процес оплати ──
-async function processPayment() {
-  const btn = document.getElementById('payBtn');
-
-  // Валідація
-  const card = cardInput.value.replace(/\s/g, '');
-  const expiry = expiryInput.value.replace(/\s/g, '').replace('/', '');
-  const cvc = cvcInput.value;
+payBtn.addEventListener('click', async () => {
   const name = document.getElementById('name').value.trim();
   const email = document.getElementById('email').value.trim();
   const phone = document.getElementById('phone').value.trim();
 
-  let ok = true;
+  // Валідація
+  if (!name) { showFieldError('name', "Введи ім'я"); return; }
+  if (!email || !email.includes('@')) { showFieldError('email', 'Введи email'); return; }
 
-  if (!name) { showError('name', "Введи ім'я"); ok = false; }
-  if (!email || !email.includes('@')) { showError('email', 'Введи email'); ok = false; }
-  if (card.length < 14) { showError('cardNumber', 'Невірний номер картки'); ok = false; }
-  if (expiry.length < 4) { showError('expiry', 'ММ / РР'); ok = false; }
-  if (cvc.length < 3) { showError('cvc', 'CVC'); ok = false; }
+  // Блокуємо кнопку
+  payBtn.disabled = true;
+  payBtn.innerHTML = '<span class="spinner"></span> Обробка...';
+  document.getElementById('card-errors').textContent = '';
 
-  if (!ok) return;
+  try {
+    // 1. Створюємо PaymentIntent (amount у копійках)
+    const amountKopiyok = total * 100;
 
-  // Анімація завантаження
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Обробка...';
+    const piRes = await fetch('/api/create-payment-intent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: amountKopiyok,
+        currency: 'uah',
+        customerName: name,
+        customerEmail: email,
+        customerPhone: phone,
+      }),
+    });
 
-  // Імітація обробки (1.5–2.5 сек)
-  const delay = 1500 + Math.random() * 1000;
-  await new Promise(r => setTimeout(r, delay));
+    const piData = await piRes.json();
+    if (!piRes.ok) throw new Error(piData.error || 'Помилка сервера');
 
-  // Показуємо успіх
-  document.getElementById('successOverlay').classList.remove('hidden');
-  launchConfetti();
+    // 2. Підтверджуємо оплату карткою
+    const { error, paymentIntent } = await stripe.confirmCardPayment(piData.clientSecret, {
+      payment_method: {
+        card: card,
+        billing_details: {
+          name: name,
+          email: email,
+          phone: phone,
+        },
+      },
+    });
 
-  // Оновлюємо повідомлення
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    if (paymentIntent.status === 'succeeded') {
+      showSuccess(name, email);
+    } else {
+      throw new Error('Статус платежу: ' + paymentIntent.status);
+    }
+
+  } catch (err) {
+    console.error('Payment error:', err);
+    showPaymentError(err.message);
+  } finally {
+    payBtn.disabled = false;
+    payBtn.innerHTML = '<span>🔒</span> Сплатити <span id="totalBtn">' + total + ' грн</span>';
+  }
+});
+
+// ── Field error ──
+function showFieldError(id, msg) {
+  const el = document.getElementById(id);
+  el.classList.add('error-input');
+  el.placeholder = msg;
+  el.value = '';
+  el.focus();
+  el.addEventListener('input', () => el.classList.remove('error-input'), { once: true });
+}
+
+// ── Success ──
+function showSuccess(name, email) {
   document.getElementById('successMsg').innerHTML =
     `Дякуємо, <strong>${name}</strong>!<br>` +
-    `Замовлення на <strong>${total} грн</strong> прийнято.<br>` +
+    `П платіж на <strong>${total} грн</strong> успішно оброблено.<br>` +
     `Чек надішлемо на ${email}`;
+  document.getElementById('successOverlay').classList.remove('hidden');
+  launchConfetti();
+}
+
+// ── Error ──
+function showPaymentError(msg) {
+  document.getElementById('errorMsg').textContent = msg;
+  document.getElementById('errorOverlay').classList.remove('hidden');
+}
+
+function closeError() {
+  document.getElementById('errorOverlay').classList.add('hidden');
+}
+
+function showErrorPage(msg) {
+  document.getElementById('errorMsg').innerHTML = msg;
+  document.getElementById('errorOverlay').classList.remove('hidden');
+  payBtn.style.display = 'none';
 }
 
 // ── Конфеті ──
@@ -503,7 +449,6 @@ function launchConfetti() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   const ctx = canvas.getContext('2d');
-
   const colors = ['#635BFF', '#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF', '#FF8B94'];
   const particles = [];
 
@@ -543,15 +488,17 @@ function launchConfetti() {
   requestAnimationFrame(animate);
 }
 
-// ── Повернутися ──
+// ── Go back ──
 function goBack() {
-  // Якщо відкрито з головної сторінки — вертаємось з параметром
   if (document.referrer) {
     location.href = document.referrer + '?paid=success';
   } else {
     location.href = '/?paid=success';
   }
 }
+
+// ── Старт ──
+init();
 </script>
 </body>
 </html>
