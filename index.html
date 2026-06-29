@@ -1,112 +1,423 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Теплий Хліб — Пекарня</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Georgia', serif; color: #3d2b1f; background: #fdf8f3; line-height: 1.6; }
-        .hero {
-            background: linear-gradient(135deg, #8b5e3c 0%, #a0522d 30%, #c4723a 60%, #d4a574 100%);
-            height: 70vh; display: flex; align-items: center; justify-content: center;
-            text-align: center; color: white; position: relative; overflow: hidden;
-        }
-        .hero::before {
-            content: "🥐 🍞 🥖 🥨 🥯";
-            position: absolute; font-size: 8rem; opacity: 0.12;
-            animation: float 8s ease-in-out infinite;
-        }
-        @keyframes float { 0%,100% { transform: translateY(0) rotate(-5deg); } 50% { transform: translateY(-20px) rotate(5deg); } }
-        .hero h1 { font-size: 4rem; text-shadow: 2px 2px 8px rgba(0,0,0,0.4); position: relative; }
-        .hero p { font-size: 1.4rem; margin-top: 10px; opacity: 0.95; position: relative; }
-        .section { padding: 60px 20px; max-width: 900px; margin: 0 auto; }
-        .section h2 { font-size: 2rem; text-align: center; margin-bottom: 30px; color: #8b5e3c; }
-        .products { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 25px; }
-        .product {
-            background: white; border-radius: 16px; overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center;
-            transition: transform 0.2s; padding-bottom: 15px;
-        }
-        .product:hover { transform: translateY(-4px); }
-        .product .img {
-            height: 160px; display: flex; align-items: center; justify-content: center;
-            font-size: 5rem;
-        }
-        .product:nth-child(1) .img { background: linear-gradient(135deg, #f5deb3, #deb887); }
-        .product:nth-child(2) .img { background: linear-gradient(135deg, #ffe4b5, #f0c060); }
-        .product:nth-child(3) .img { background: linear-gradient(135deg, #faebd7, #e8c47a); }
-        .product:nth-child(4) .img { background: linear-gradient(135deg, #ffe4c4, #dda15e); }
-        .product h3 { padding: 12px 10px 5px; font-size: 1.1rem; }
-        .product .price { color: #c0392b; font-weight: bold; font-size: 1.2rem; }
-        .cta {
-            text-align: center; padding: 50px 20px;
-            background: linear-gradient(135deg, #8b5e3c, #a0522d); color: white;
-        }
-        .cta h2 { color: white; }
-        .btn {
-            display: inline-block; margin-top: 15px; padding: 14px 35px;
-            background: #e67e22; color: white; text-decoration: none;
-            border-radius: 8px; font-size: 1.1rem; font-weight: bold;
-            transition: background 0.2s;
-        }
-        .btn:hover { background: #d35400; }
-        footer { text-align: center; padding: 25px; color: #999; font-size: 0.9rem; }
-        .badge {
-            display: inline-block; padding: 6px 14px; background: #27ae60;
-            color: white; border-radius: 20px; font-size: 0.85rem; margin-bottom: 15px;
-            position: relative;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Теплий Хліб — Свіжа випічка</title>
+<style>
+:root {
+  --warm: #8b5e3c;
+  --gold: #d4a574;
+  --cream: #fdf8f3;
+  --dark: #3d2b1f;
+  --red: #c0392b;
+  --green: #27ae60;
+  --orange: #e67e22;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Georgia', 'Times New Roman', serif; color: var(--dark); background: var(--cream); }
+/* ── header ── */
+header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 30px; background: white; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  position: sticky; top: 0; z-index: 100;
+}
+.logo { font-size: 1.5rem; font-weight: bold; color: var(--warm); }
+.logo span { color: var(--orange); }
+.cart-btn {
+  background: var(--warm); color: white; border: none;
+  padding: 10px 18px; border-radius: 25px; cursor: pointer;
+  font-size: 0.95rem; font-family: inherit; position: relative;
+}
+.cart-btn:hover { background: #6b3f22; }
+.cart-count {
+  position: absolute; top: -6px; right: -8px;
+  background: var(--red); color: white; font-size: 0.7rem;
+  width: 20px; height: 20px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: bold;
+}
+/* ── hero ── */
+.hero {
+  background: linear-gradient(135deg, #8b5e3c 0%, #a0522d 35%, #c4723a 60%, #d4a574 100%);
+  padding: 80px 20px; text-align: center; color: white; position: relative; overflow: hidden;
+}
+.hero::after {
+  content: "🥐 🍞 🥖 🥨 🥯 🥐 🍞 🥖 🥨 🥯";
+  position: absolute; font-size: 6rem; opacity: 0.08; white-space: nowrap;
+  animation: slide 20s linear infinite; bottom: 10px; left: 0;
+}
+@keyframes slide { to { transform: translateX(-50%); } }
+.hero h1 { font-size: 3.2rem; margin-bottom: 10px; text-shadow: 2px 2px 8px rgba(0,0,0,0.3); }
+.hero p { font-size: 1.2rem; opacity: 0.92; margin-bottom: 20px; }
+.hero .badge {
+  display: inline-block; background: var(--green); padding: 6px 18px;
+  border-radius: 20px; font-size: 0.9rem; margin-bottom: 15px;
+}
+/* ── benefits ── */
+.benefits {
+  display: flex; justify-content: center; gap: 40px; padding: 30px 20px;
+  flex-wrap: wrap; background: white; border-bottom: 1px solid #eee;
+}
+.benefit { text-align: center; font-size: 0.95rem; }
+.benefit .icon { font-size: 2rem; margin-bottom: 6px; }
+/* ── section ── */
+section { padding: 50px 20px; max-width: 1000px; margin: 0 auto; }
+h2 { text-align: center; font-size: 2rem; color: var(--warm); margin-bottom: 35px; }
+/* ── products ── */
+.products {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+}
+.product {
+  background: white; border-radius: 16px; overflow: hidden;
+  box-shadow: 0 3px 16px rgba(0,0,0,0.07); transition: transform 0.2s, box-shadow 0.2s;
+  display: flex; flex-direction: column;
+}
+.product:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(0,0,0,0.12); }
+.product-img {
+  height: 180px; display: flex; align-items: center; justify-content: center;
+  font-size: 5rem;
+}
+.product:nth-child(1) .product-img { background: linear-gradient(135deg, #f5deb3, #deb887); }
+.product:nth-child(2) .product-img { background: linear-gradient(135deg, #ffe4b5, #f0c060); }
+.product:nth-child(3) .product-img { background: linear-gradient(135deg, #faebd7, #e8c47a); }
+.product:nth-child(4) .product-img { background: linear-gradient(135deg, #ffe4c4, #dda15e); }
+.product:nth-child(5) .product-img { background: linear-gradient(135deg, #fce4b8, #c9a96e); }
+.product:nth-child(6) .product-img { background: linear-gradient(135deg, #fef0d5, #d4b896); }
+.product-info { padding: 16px; flex: 1; display: flex; flex-direction: column; }
+.product-info h3 { font-size: 1.05rem; margin-bottom: 6px; }
+.product-info .desc { font-size: 0.85rem; color: #777; margin-bottom: 10px; flex: 1; }
+.product-info .bottom { display: flex; align-items: center; justify-content: space-between; }
+.price { font-size: 1.25rem; font-weight: bold; color: var(--red); }
+.add-btn {
+  background: var(--orange); color: white; border: none;
+  padding: 8px 16px; border-radius: 8px; cursor: pointer;
+  font-family: inherit; font-size: 0.9rem; font-weight: bold;
+  transition: background 0.2s;
+}
+.add-btn:hover { background: #d35400; }
+.add-btn.added { background: var(--green); animation: pop 0.3s; }
+@keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+/* ── cart sidebar ── */
+.cart-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  z-index: 200; display: none;
+}
+.cart-overlay.open { display: block; }
+.cart-sidebar {
+  position: fixed; top: 0; right: -420px; width: 400px; height: 100vh;
+  background: white; z-index: 201; transition: right 0.3s;
+  display: flex; flex-direction: column; box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+}
+.cart-sidebar.open { right: 0; }
+.cart-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 20px; border-bottom: 1px solid #eee;
+}
+.cart-header h3 { font-size: 1.2rem; color: var(--warm); }
+.close-btn {
+  background: none; border: none; font-size: 1.5rem; cursor: pointer;
+  color: #999; line-height: 1;
+}
+.cart-items { flex: 1; overflow-y: auto; padding: 15px 20px; }
+.cart-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid #f5f5f5;
+}
+.cart-item .emoji { font-size: 2.2rem; }
+.cart-item .details { flex: 1; }
+.cart-item .name { font-weight: bold; font-size: 0.95rem; }
+.cart-item .item-price { color: #888; font-size: 0.85rem; }
+.cart-item .qty {
+  display: flex; align-items: center; gap: 6px;
+}
+.qty button {
+  width: 26px; height: 26px; border-radius: 50%; border: 1px solid #ccc;
+  background: white; cursor: pointer; font-size: 1rem; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+}
+.qty span { min-width: 20px; text-align: center; font-weight: bold; }
+.remove { color: var(--red); cursor: pointer; font-size: 1.1rem; background: none; border: none; }
+.cart-footer {
+  padding: 20px; border-top: 2px solid #eee;
+}
+.cart-total {
+  display: flex; justify-content: space-between; font-size: 1.15rem;
+  font-weight: bold; margin-bottom: 15px;
+}
+.cart-empty { text-align: center; color: #999; padding: 60px 20px; }
+.cart-empty .icon { font-size: 3rem; margin-bottom: 10px; }
+/* ── order form ── */
+.order-btn {
+  display: block; width: 100%; padding: 14px;
+  background: var(--green); color: white; border: none;
+  border-radius: 10px; font-size: 1.05rem; font-weight: bold;
+  cursor: pointer; font-family: inherit;
+}
+.order-btn:hover { background: #219a52; }
+.order-form { padding: 0 20px 20px; }
+.order-form input {
+  display: block; width: 100%; padding: 11px 14px; margin-bottom: 10px;
+  border: 1px solid #ddd; border-radius: 8px; font-size: 0.95rem;
+  font-family: inherit;
+}
+.order-form input:focus { outline: none; border-color: var(--warm); }
+.submit-btn {
+  display: block; width: 100%; padding: 13px;
+  background: var(--warm); color: white; border: none;
+  border-radius: 10px; font-size: 1rem; font-weight: bold;
+  cursor: pointer; font-family: inherit;
+}
+.submit-btn:hover { background: #6b3f22; }
+.success {
+  text-align: center; padding: 30px 20px; display: none;
+}
+.success.show { display: block; }
+.success .icon { font-size: 4rem; }
+.success h3 { color: var(--green); margin: 10px 0; }
+/* ── about ── */
+.about {
+  background: white; padding: 50px 20px; text-align: center;
+  border-top: 1px solid #eee;
+}
+.about p { max-width: 600px; margin: 0 auto; color: #666; line-height: 1.8; }
+/* ── footer ── */
+footer {
+  background: var(--dark); color: #bbb; text-align: center;
+  padding: 25px 20px; font-size: 0.9rem;
+}
+footer .ai-badge {
+  display: inline-block; margin-top: 8px; padding: 5px 14px;
+  background: #5c3d2e; border-radius: 20px; color: var(--gold);
+  font-size: 0.8rem;
+}
+/* ── toast ── */
+.toast {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+  background: var(--dark); color: white; padding: 12px 24px;
+  border-radius: 25px; font-size: 0.95rem; z-index: 300;
+  opacity: 0; transition: opacity 0.3s;
+}
+.toast.show { opacity: 1; }
+/* ── mobile ── */
+@media (max-width: 600px) {
+  .hero h1 { font-size: 2.2rem; }
+  .cart-sidebar { width: 100%; right: -100%; }
+  .benefits { gap: 20px; }
+}
+</style>
 </head>
 <body>
+
+<header>
+  <div class="logo">🥐 Теплий <span>Хліб</span></div>
+  <button class="cart-btn" onclick="toggleCart()">
+    🛒 Кошик
+    <span class="cart-count" id="cartCount" style="display:none">0</span>
+  </button>
+</header>
+
 <section class="hero">
-    <div style="position:relative">
-        <span class="badge">🥐 Свіжа випічка щодня</span>
-        <h1>Теплий Хліб</h1>
-        <p>Справжній смак домашньої випічки з 1998 року</p>
-        <a href="#products" class="btn">Дивитись меню</a>
-    </div>
+  <div class="badge">🥖 Свіжа випічка щодня з 7:00</div>
+  <h1>Теплий Хліб</h1>
+  <p>Домашня випічка за бабусиними рецептами. <br>З любов'ю з 1998 року.</p>
+  <p style="font-size:0.95rem">📍 Київ, вул. Хлібна, 15 &nbsp;|&nbsp; 📞 (044) 123-45-67</p>
 </section>
 
-<section class="section" id="products">
-    <h2>🍞 Наша продукція</h2>
-    <div class="products">
-        <div class="product">
-            <div class="img">🍞</div>
-            <h3>Хліб пшеничний</h3>
-            <div class="price">45 грн</div>
-        </div>
-        <div class="product">
-            <div class="img">🥐</div>
-            <h3>Круасан з маслом</h3>
-            <div class="price">38 грн</div>
-        </div>
-        <div class="product">
-            <div class="img">🥖</div>
-            <h3>Батон нарізний</h3>
-            <div class="price">32 грн</div>
-        </div>
-        <div class="product">
-            <div class="img">🥯</div>
-            <h3>Булочка з маком</h3>
-            <div class="price">18 грн</div>
-        </div>
-    </div>
+<div class="benefits">
+  <div class="benefit"><div class="icon">👨‍🍳</div>Ручна робота</div>
+  <div class="benefit"><div class="icon">🌾</div>Натуральні інгредієнти</div>
+  <div class="benefit"><div class="icon">🔥</div>Щойно з печі</div>
+  <div class="benefit"><div class="icon">🚚</div>Доставка за 30 хв</div>
+</div>
+
+<section id="menu">
+  <h2>🍞 Наше меню</h2>
+  <div class="products" id="products"></div>
 </section>
 
-<section class="cta" id="order">
-    <h2>🕐 Замовляйте свіжий хліб</h2>
-    <p style="font-size:1.1rem;margin-top:10px">Працюємо щодня з 7:00 до 21:00</p>
-    <p style="margin-top:8px">📍 Київ, вул. Хлібна, 15 | 📞 (044) 123-45-67</p>
-    <a href="tel:+380441234567" class="btn">📞 Подзвонити</a>
+<section class="about">
+  <h2>🏠 Про нас</h2>
+  <p>
+    Пекарня «Теплий Хліб» — це сімейна справа з 1998 року. Ми випікаємо хліб,
+    круасани, багети та солодку випічку щодня за традиційними рецептами.
+    Жодних консервантів — тільки борошно, вода, дріжджі та любов.
+  </p>
 </section>
 
 <footer>
-    <p>© 2026 Пекарня «Теплий Хліб» | 🧠 Створено агентом Hermes на YouSelf.io</p>
-    <p style="margin-top: 5px; font-size: 0.8rem;">
-        Рішення: Nemotron 3 Ultra • NemoClaw • Stripe • $120 бюджет
-    </p>
+  <p>© 2026 Пекарня «Теплий Хліб». Всі права захищено.</p>
+  <p>📍 Київ, вул. Хлібна, 15 &nbsp;|&nbsp; 📞 (044) 123-45-67 &nbsp;|&nbsp; 🕐 7:00–21:00</p>
+  <div class="ai-badge">🧠 Створено агентом Hermes на YouSelf.io</div>
 </footer>
+
+<!-- Cart overlay -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="cart-sidebar" id="cartSidebar">
+  <div class="cart-header">
+    <h3>🛒 Ваше замовлення</h3>
+    <button class="close-btn" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-footer" id="cartFooter"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const products = [
+  { id: 1, name: "Хліб пшеничний", desc: "Класичний білий хліб на заквасці", price: 45, emoji: "🍞" },
+  { id: 2, name: "Круасан з маслом", desc: "Листковий, хрумкий, ніжний", price: 38, emoji: "🥐" },
+  { id: 3, name: "Батон нарізний", desc: "Повітряний м'якуш, золота скоринка", price: 32, emoji: "🥖" },
+  { id: 4, name: "Булочка з маком", desc: "Солодка здоба з хрустким маком", price: 18, emoji: "🥯" },
+  { id: 5, name: "Чіабата", desc: "Італійська з хрусткою скоринкою", price: 42, emoji: "🥨" },
+  { id: 6, name: "Пиріжок з вишнею", desc: "Солодка начинка, ніжне тісто", price: 25, emoji: "🥮" },
+];
+
+let cart = [];
+let showOrderForm = false;
+
+function renderProducts() {
+  document.getElementById('products').innerHTML = products.map(p => `
+    <div class="product">
+      <div class="product-img">${p.emoji}</div>
+      <div class="product-info">
+        <h3>${p.name}</h3>
+        <div class="desc">${p.desc}</div>
+        <div class="bottom">
+          <span class="price">${p.price} грн</span>
+          <button class="add-btn" id="btn-${p.id}" onclick="addToCart(${p.id})">+ У кошик</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addToCart(id) {
+  const p = products.find(x => x.id === id);
+  const existing = cart.find(x => x.id === id);
+  if (existing) { existing.qty++; }
+  else { cart.push({ ...p, qty: 1 }); }
+  
+  const btn = document.getElementById('btn-' + id);
+  btn.textContent = '✓ Додано';
+  btn.classList.add('added');
+  setTimeout(() => { btn.textContent = '+ У кошик'; btn.classList.remove('added'); }, 800);
+  
+  updateCart();
+}
+
+function updateCart() {
+  const count = cart.reduce((s, x) => s + x.qty, 0);
+  const el = document.getElementById('cartCount');
+  el.textContent = count;
+  el.style.display = count > 0 ? 'flex' : 'none';
+  
+  renderCart();
+}
+
+function renderCart() {
+  const items = document.getElementById('cartItems');
+  const footer = document.getElementById('cartFooter');
+  
+  if (cart.length === 0) {
+    items.innerHTML = '<div class="cart-empty"><div class="icon">🛒</div><p>Кошик порожній</p><p style="font-size:0.8rem">Додайте смаколики з меню</p></div>';
+    footer.innerHTML = '';
+    showOrderForm = false;
+    return;
+  }
+  
+  const total = cart.reduce((s, x) => s + x.price * x.qty, 0);
+  
+  items.innerHTML = cart.map((item, i) => `
+    <div class="cart-item">
+      <div class="emoji">${item.emoji}</div>
+      <div class="details">
+        <div class="name">${item.name}</div>
+        <div class="item-price">${item.price} грн × ${item.qty} = <b>${item.price * item.qty} грн</b></div>
+      </div>
+      <div class="qty">
+        <button onclick="changeQty(${i}, -1)">−</button>
+        <span>${item.qty}</span>
+        <button onclick="changeQty(${i}, 1)">+</button>
+      </div>
+      <button class="remove" onclick="removeItem(${i})">🗑</button>
+    </div>
+  `).join('');
+  
+  if (showOrderForm) {
+    footer.innerHTML = `
+      <div class="order-form">
+        <input type="text" id="customerName" placeholder="Ваше ім'я">
+        <input type="tel" id="customerPhone" placeholder="Телефон">
+        <input type="text" id="customerAddress" placeholder="Адреса доставки">
+        <button class="submit-btn" onclick="submitOrder()">📦 Оформити замовлення</button>
+        <button style="display:block;width:100%;margin-top:8px;padding:10px;background:none;border:none;color:#888;cursor:pointer;font-family:inherit" onclick="showOrderForm=false;renderCart()">← Назад</button>
+      </div>
+    `;
+  } else {
+    footer.innerHTML = `
+      <div class="cart-total">
+        <span>Разом:</span>
+        <span>${total} грн</span>
+      </div>
+      <button class="order-btn" onclick="startOrder()">📋 Оформити замовлення</button>
+    `;
+  }
+}
+
+function changeQty(i, delta) {
+  cart[i].qty += delta;
+  if (cart[i].qty <= 0) { cart.splice(i, 1); }
+  updateCart();
+}
+
+function removeItem(i) { cart.splice(i, 1); updateCart(); }
+
+function startOrder() {
+  showOrderForm = true;
+  renderCart();
+}
+
+function submitOrder() {
+  const name = document.getElementById('customerName').value.trim();
+  const phone = document.getElementById('customerPhone').value.trim();
+  const addr = document.getElementById('customerAddress').value.trim();
+  
+  if (!name || !phone) {
+    showToast('⚠️ Будь ласка, вкажіть імʼя та телефон');
+    return;
+  }
+  
+  const total = cart.reduce((s, x) => s + x.price * x.qty, 0);
+  const items = cart.map(x => `${x.name} ×${x.qty}`).join(', ');
+  
+  const order = { name, phone, address: addr, items, total };
+  console.log('✅ Замовлення:', order);
+  
+  cart = [];
+  showOrderForm = false;
+  updateCart();
+  toggleCart();
+  
+  showToast(`✅ Дякуємо, ${name}! Замовлення на ${total} грн прийнято. Чекайте дзвінка!`);
+}
+
+function toggleCart() {
+  document.getElementById('cartSidebar').classList.toggle('open');
+  document.getElementById('cartOverlay').classList.toggle('open');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+renderProducts();
+</script>
 </body>
 </html>
