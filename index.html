@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Теплий Хліб — Свіжа випічка</title>
+<script src="https://js.stripe.com/v3/"></script>
 <style>
 :root {
   --warm: #8b5e3c;
@@ -267,13 +268,15 @@ footer .ai-badge {
 <div class="toast" id="toast"></div>
 
 <script>
+const stripe = Stripe('pk_test_51TnaEmRyrez9SEApuWztyW3yTJBSmgKN9bqAc7v9uE2Ekp01uKtejXcljABSioAksP0jRh1B1MDdzIompO4PIidS00YVsO4jMp');
+
 const products = [
-  { id: 1, name: "Хліб пшеничний", desc: "Класичний білий хліб на заквасці", price: 45, emoji: "🍞" },
-  { id: 2, name: "Круасан з маслом", desc: "Листковий, хрумкий, ніжний", price: 38, emoji: "🥐" },
-  { id: 3, name: "Батон нарізний", desc: "Повітряний м'якуш, золота скоринка", price: 32, emoji: "🥖" },
-  { id: 4, name: "Булочка з маком", desc: "Солодка здоба з хрустким маком", price: 18, emoji: "🥯" },
-  { id: 5, name: "Чіабата", desc: "Італійська з хрусткою скоринкою", price: 42, emoji: "🥨" },
-  { id: 6, name: "Пиріжок з вишнею", desc: "Солодка начинка, ніжне тісто", price: 25, emoji: "🥮" },
+  { id: 1, name: "Хліб пшеничний", desc: "Класичний білий хліб на заквасці", price: 45, emoji: "🍞", stripePrice: "price_1TnfOYRyrez9SEApRVf7hJWj" },
+  { id: 2, name: "Круасан з маслом", desc: "Листковий, хрумкий, ніжний", price: 38, emoji: "🥐", stripePrice: "price_1TnfOZRyrez9SEAp8tImM5Nf" },
+  { id: 3, name: "Батон нарізний", desc: "Повітряний м'якуш, золота скоринка", price: 32, emoji: "🥖", stripePrice: "price_1TnfOaRyrez9SEAprASxbT2r" },
+  { id: 4, name: "Булочка з маком", desc: "Солодка здоба з хрустким маком", price: 18, emoji: "🥯", stripePrice: "price_1TnfObRyrez9SEAp5NNHnxQu" },
+  { id: 5, name: "Чіабата", desc: "Італійська з хрусткою скоринкою", price: 42, emoji: "🥨", stripePrice: "price_1TnfObRyrez9SEApLnLk131H" },
+  { id: 6, name: "Пиріжок з вишнею", desc: "Солодка начинка, ніжне тісто", price: 25, emoji: "🥮", stripePrice: "price_1TnfOcRyrez9SEApfgM1qFHG" },
 ];
 
 let cart = [];
@@ -352,8 +355,7 @@ function renderCart() {
       <div class="order-form">
         <input type="text" id="customerName" placeholder="Ваше ім'я">
         <input type="tel" id="customerPhone" placeholder="Телефон">
-        <input type="text" id="customerAddress" placeholder="Адреса доставки">
-        <button class="submit-btn" onclick="submitOrder()">📦 Оформити замовлення</button>
+        <button class="submit-btn" onclick="submitOrder()">💳 Сплатити через Stripe</button>
         <button style="display:block;width:100%;margin-top:8px;padding:10px;background:none;border:none;color:#888;cursor:pointer;font-family:inherit" onclick="showOrderForm=false;renderCart()">← Назад</button>
       </div>
     `;
@@ -384,25 +386,32 @@ function startOrder() {
 function submitOrder() {
   const name = document.getElementById('customerName').value.trim();
   const phone = document.getElementById('customerPhone').value.trim();
-  const addr = document.getElementById('customerAddress').value.trim();
   
   if (!name || !phone) {
     showToast('⚠️ Будь ласка, вкажіть імʼя та телефон');
     return;
   }
   
-  const total = cart.reduce((s, x) => s + x.price * x.qty, 0);
-  const items = cart.map(x => `${x.name} ×${x.qty}`).join(', ');
+  const lineItems = cart.map(x => ({
+    price: x.stripePrice,
+    quantity: x.qty
+  }));
   
-  const order = { name, phone, address: addr, items, total };
-  console.log('✅ Замовлення:', order);
-  
-  cart = [];
-  showOrderForm = false;
-  updateCart();
-  toggleCart();
-  
-  showToast(`✅ Дякуємо, ${name}! Замовлення на ${total} грн прийнято. Чекайте дзвінка!`);
+  stripe.redirectToCheckout({
+    lineItems: lineItems,
+    mode: 'payment',
+    successUrl: window.location.href + '?paid=success',
+    cancelUrl: window.location.href,
+    customerEmail: undefined,
+    metadata: {
+      customer_name: name,
+      customer_phone: phone
+    }
+  }).then(function(result) {
+    if (result.error) {
+      showToast('❌ ' + result.error.message);
+    }
+  });
 }
 
 function toggleCart() {
@@ -418,6 +427,12 @@ function showToast(msg) {
 }
 
 renderProducts();
+
+// Show success message if returning from Stripe
+if (window.location.search.includes('paid=success')) {
+  setTimeout(() => showToast('✅ Оплата успішна! Дякуємо за замовлення!'), 500);
+  window.history.replaceState({}, '', window.location.pathname);
+}
 </script>
 </body>
 </html>
