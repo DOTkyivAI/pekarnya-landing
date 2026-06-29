@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Теплий Хліб — Пекарня</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Georgia', serif; color: #3d2b1f; background: #fdf8f3; line-height: 1.6; }
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+                        url('https://images.unsplash.com/photo-1509440159596-0249088772ff?w=1200');
+            background-size: cover; background-position: center;
+            height: 70vh; display: flex; align-items: center; justify-content: center;
+            text-align: center; color: white;
+        }
+        .hero h1 { font-size: 4rem; text-shadow: 2px 2px 8px rgba(0,0,0,0.6); }
+        .hero p { font-size: 1.4rem; margin-top: 10px; opacity: 0.95; }
+        .section { padding: 60px 20px; max-width: 900px; margin: 0 auto; }
+        .section h2 { font-size: 2rem; text-align: center; margin-bottom: 30px; color: #8b5e3c; }
+        .products { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; }
+        .product {
+            background: white; border-radius: 12px; overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08); text-align: center;
+            transition: transform 0.2s;
+        }
+        .product:hover { transform: translateY(-4px); }
+        .product img { width: 100%; height: 180px; object-fit: cover; }
+        .product h3 { padding: 12px 10px 5px; font-size: 1.1rem; }
+        .product .price { color: #c0392b; font-weight: bold; font-size: 1.2rem; padding-bottom: 15px; }
+        .cta {
+            text-align: center; padding: 50px 20px;
+            background: linear-gradient(135deg, #8b5e3c, #a0522d); color: white;
+        }
+        .cta h2 { color: white; }
+        .btn {
+            display: inline-block; margin-top: 15px; padding: 14px 35px;
+            background: #e67e22; color: white; text-decoration: none;
+            border-radius: 8px; font-size: 1.1rem; font-weight: bold;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: #d35400; }
+        footer { text-align: center; padding: 25px; color: #999; font-size: 0.9rem; }
+        .badge {
+            display: inline-block; padding: 6px 14px; background: #27ae60;
+            color: white; border-radius: 20px; font-size: 0.85rem; margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<section class="hero">
+    <div>
+        <span class="badge">🥐 Свіжа випічка щодня</span>
+        <h1>Теплий Хліб</h1>
+        <p>Справжній смак домашньої випічки з 1998 року</p>
+        <a href="#order" class="btn">Замовити зараз</a>
+    </div>
+</section>
+
+<section class="section" id="products">
+    <h2>🍞 Наша продукція</h2>
+    <div class="products">
+        <div class="product">
+            <img src="https://images.unsplash.com/photo-1549931319-a545799f7b9e?w=400" alt="Хліб пшеничний">
+            <h3>Хліб пшеничний</h3>
+            <div class="price">45 грн</div>
+        </div>
+        <div class="product">
+            <img src="https://images.unsplash.com/photo-1555507036-ab1f4038024a?w=400" alt="Круасан">
+            <h3>Круасан з маслом</h3>
+            <div class="price">38 грн</div>
+        </div>
+        <div class="product">
+            <img src="https://images.unsplash.com/photo-1517433670267-08bbd4be8907?w=400" alt="Батон">
+            <h3>Батон нарізний</h3>
+            <div class="price">32 грн</div>
+        </div>
+        <div class="product">
+            <img src="https://images.unsplash.com/photo-1509365465985-25d11c17e812?w=400" alt="Булочка">
+            <h3>Булочка з маком</h3>
+            <div class="price">18 грн</div>
+        </div>
+    </div>
+</section>
+
+<section class="cta" id="order">
+    <h2>🕐 Замовляйте свіжий хліб</h2>
+    <p style="font-size: 1.1rem; margin-top: 10px;">Працюємо щодня з 7:00 до 21:00</p>
+    <p style="margin-top: 8px;">📍 Київ, вул. Хлібна, 15 | 📞 (044) 123-45-67</p>
+    <a href="tel:+380441234567" class="btn">📞 Подзвонити</a>
+</section>
+
+<footer>
+    <p>© 2026 Пекарня «Теплий Хліб» | Створено агентом Hermes на YouSelf.io</p>
+</footer>
+
+</body>
+</html>
