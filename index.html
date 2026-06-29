@@ -8,26 +8,37 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Georgia', serif; color: #3d2b1f; background: #fdf8f3; line-height: 1.6; }
         .hero {
-            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
-                        url('https://images.unsplash.com/photo-1509440159596-0249088772ff?w=1200');
-            background-size: cover; background-position: center;
+            background: linear-gradient(135deg, #8b5e3c 0%, #a0522d 30%, #c4723a 60%, #d4a574 100%);
             height: 70vh; display: flex; align-items: center; justify-content: center;
-            text-align: center; color: white;
+            text-align: center; color: white; position: relative; overflow: hidden;
         }
-        .hero h1 { font-size: 4rem; text-shadow: 2px 2px 8px rgba(0,0,0,0.6); }
-        .hero p { font-size: 1.4rem; margin-top: 10px; opacity: 0.95; }
+        .hero::before {
+            content: "🥐 🍞 🥖 🥨 🥯";
+            position: absolute; font-size: 8rem; opacity: 0.12;
+            animation: float 8s ease-in-out infinite;
+        }
+        @keyframes float { 0%,100% { transform: translateY(0) rotate(-5deg); } 50% { transform: translateY(-20px) rotate(5deg); } }
+        .hero h1 { font-size: 4rem; text-shadow: 2px 2px 8px rgba(0,0,0,0.4); position: relative; }
+        .hero p { font-size: 1.4rem; margin-top: 10px; opacity: 0.95; position: relative; }
         .section { padding: 60px 20px; max-width: 900px; margin: 0 auto; }
         .section h2 { font-size: 2rem; text-align: center; margin-bottom: 30px; color: #8b5e3c; }
-        .products { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; }
+        .products { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 25px; }
         .product {
-            background: white; border-radius: 12px; overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08); text-align: center;
-            transition: transform 0.2s;
+            background: white; border-radius: 16px; overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center;
+            transition: transform 0.2s; padding-bottom: 15px;
         }
         .product:hover { transform: translateY(-4px); }
-        .product img { width: 100%; height: 180px; object-fit: cover; }
+        .product .img {
+            height: 160px; display: flex; align-items: center; justify-content: center;
+            font-size: 5rem;
+        }
+        .product:nth-child(1) .img { background: linear-gradient(135deg, #f5deb3, #deb887); }
+        .product:nth-child(2) .img { background: linear-gradient(135deg, #ffe4b5, #f0c060); }
+        .product:nth-child(3) .img { background: linear-gradient(135deg, #faebd7, #e8c47a); }
+        .product:nth-child(4) .img { background: linear-gradient(135deg, #ffe4c4, #dda15e); }
         .product h3 { padding: 12px 10px 5px; font-size: 1.1rem; }
-        .product .price { color: #c0392b; font-weight: bold; font-size: 1.2rem; padding-bottom: 15px; }
+        .product .price { color: #c0392b; font-weight: bold; font-size: 1.2rem; }
         .cta {
             text-align: center; padding: 50px 20px;
             background: linear-gradient(135deg, #8b5e3c, #a0522d); color: white;
@@ -44,17 +55,17 @@
         .badge {
             display: inline-block; padding: 6px 14px; background: #27ae60;
             color: white; border-radius: 20px; font-size: 0.85rem; margin-bottom: 15px;
+            position: relative;
         }
     </style>
 </head>
 <body>
-
 <section class="hero">
-    <div>
+    <div style="position:relative">
         <span class="badge">🥐 Свіжа випічка щодня</span>
         <h1>Теплий Хліб</h1>
         <p>Справжній смак домашньої випічки з 1998 року</p>
-        <a href="#order" class="btn">Замовити зараз</a>
+        <a href="#products" class="btn">Дивитись меню</a>
     </div>
 </section>
 
@@ -62,22 +73,22 @@
     <h2>🍞 Наша продукція</h2>
     <div class="products">
         <div class="product">
-            <img src="https://images.unsplash.com/photo-1549931319-a545799f7b9e?w=400" alt="Хліб пшеничний">
+            <div class="img">🍞</div>
             <h3>Хліб пшеничний</h3>
             <div class="price">45 грн</div>
         </div>
         <div class="product">
-            <img src="https://images.unsplash.com/photo-1555507036-ab1f4038024a?w=400" alt="Круасан">
+            <div class="img">🥐</div>
             <h3>Круасан з маслом</h3>
             <div class="price">38 грн</div>
         </div>
         <div class="product">
-            <img src="https://images.unsplash.com/photo-1517433670267-08bbd4be8907?w=400" alt="Батон">
+            <div class="img">🥖</div>
             <h3>Батон нарізний</h3>
             <div class="price">32 грн</div>
         </div>
         <div class="product">
-            <img src="https://images.unsplash.com/photo-1509365465985-25d11c17e812?w=400" alt="Булочка">
+            <div class="img">🥯</div>
             <h3>Булочка з маком</h3>
             <div class="price">18 грн</div>
         </div>
@@ -86,14 +97,16 @@
 
 <section class="cta" id="order">
     <h2>🕐 Замовляйте свіжий хліб</h2>
-    <p style="font-size: 1.1rem; margin-top: 10px;">Працюємо щодня з 7:00 до 21:00</p>
-    <p style="margin-top: 8px;">📍 Київ, вул. Хлібна, 15 | 📞 (044) 123-45-67</p>
+    <p style="font-size:1.1rem;margin-top:10px">Працюємо щодня з 7:00 до 21:00</p>
+    <p style="margin-top:8px">📍 Київ, вул. Хлібна, 15 | 📞 (044) 123-45-67</p>
     <a href="tel:+380441234567" class="btn">📞 Подзвонити</a>
 </section>
 
 <footer>
-    <p>© 2026 Пекарня «Теплий Хліб» | Створено агентом Hermes на YouSelf.io</p>
+    <p>© 2026 Пекарня «Теплий Хліб» | 🧠 Створено агентом Hermes на YouSelf.io</p>
+    <p style="margin-top: 5px; font-size: 0.8rem;">
+        Рішення: Nemotron 3 Ultra • NemoClaw • Stripe • $120 бюджет
+    </p>
 </footer>
-
 </body>
 </html>
