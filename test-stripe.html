@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stripe Test</title>
+<script src="https://js.stripe.com/v3/"></script>
+<style>
+body { font-family: -apple-system, sans-serif; max-width: 500px; margin: 50px auto; padding: 20px; }
+button { display: block; width: 100%; padding: 14px; background: #635bff; color: #fff; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin: 10px 0; }
+#log { background: #f5f5f5; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 13px; white-space: pre-wrap; margin-top: 20px; max-height: 300px; overflow-y: auto; }
+.error { color: #c00; }
+.success { color: #0a0; }
+</style>
+</head>
+<body>
+<h1>🧪 Тест Stripe Checkout</h1>
+<p id="status">Завантаження...</p>
+<button id="btn" disabled onclick="go()">💳 Сплатити 45 грн (Хліб пшеничний)</button>
+<button onclick="goCart()">🛒 Кошик (3 товари)</button>
+<div id="log"></div>
+
+<script>
+const log = document.getElementById('log');
+const status = document.getElementById('status');
+
+function L(msg, cls) {
+  log.innerHTML += `<div class="${cls||''}">[${new Date().toLocaleTimeString()}] ${msg}</div>`;
+  log.scrollTop = log.scrollHeight;
+}
+
+try {
+  if (typeof Stripe === 'undefined') throw new Error('Stripe.js не завантажено!');
+  
+  const stripe = Stripe('pk_test_51TnaEmRyrez9SEApuWztyW3yTJBSmgKN9bqAc7v9uE2Ekp01uKtejXcljABSioAksP0jRh1B1MDdzIompO4PIidS00YVsO4jMp');
+  
+  status.textContent = '✅ Готово. Натисніть кнопку.';
+  status.className = 'success';
+  document.getElementById('btn').disabled = false;
+  
+  L('Stripe ініціалізовано успішно', 'success');
+  L('Publishable key: pk_test_51TnaEm...');
+
+  window.go = function() {
+    L('Запуск redirectToCheckout (1 товар)...');
+    document.getElementById('btn').disabled = true;
+    document.getElementById('btn').textContent = '⏳ Переадресація...';
+    
+    stripe.redirectToCheckout({
+      lineItems: [{ price: 'price_1TnfOYRyrez9SEApRVf7hJWj', quantity: 1 }],
+      mode: 'payment',
+      successUrl: location.origin + location.pathname + '?paid=ok',
+      cancelUrl: location.origin + location.pathname,
+    }).then(function(r) {
+      if (r.error) {
+        L('❌ ПОМИЛКА: ' + r.error.message, 'error');
+        L('Тип: ' + r.error.type, 'error');
+        L('Код: ' + (r.error.code || 'нема'), 'error');
+        document.getElementById('btn').disabled = false;
+        document.getElementById('btn').textContent = '💳 Сплатити 45 грн (Хліб пшеничний)';
+      }
+    }).catch(function(e) {
+      L('❌ ВИНЯТОК: ' + e.message, 'error');
+      document.getElementById('btn').disabled = false;
+      document.getElementById('btn').textContent = '💳 Сплатити 45 грн (Хліб пшеничний)';
+    });
+  };
+
+  window.goCart = function() {
+    L('Запуск redirectToCheckout (3 товари)...');
+    stripe.redirectToCheckout({
+      lineItems: [
+        { price: 'price_1TnfOYRyrez9SEApRVf7hJWj', quantity: 1 },
+        { price: 'price_1TnfOZRyrez9SEAp8tImM5Nf', quantity: 1 },
+        { price: 'price_1TnfOaRyrez9SEAprASxbT2r', quantity: 2 },
+      ],
+      mode: 'payment',
+      successUrl: location.origin + location.pathname + '?paid=ok',
+      cancelUrl: location.origin + location.pathname,
+    }).then(function(r) {
+      if (r.error) {
+        L('❌ ПОМИЛКА: ' + r.error.message, 'error');
+      }
+    }).catch(function(e) {
+      L('❌ ВИНЯТОК: ' + e.message, 'error');
+    });
+  };
+
+} catch(e) {
+  status.textContent = '❌ ' + e.message;
+  status.className = 'error';
+  L('ПОМИЛКА: ' + e.message, 'error');
+  L('Можливо, Stripe.js заблоковано (AdBlock, мережа).');
+}
+</script>
+</body>
+</html>
