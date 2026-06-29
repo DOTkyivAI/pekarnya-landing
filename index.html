@@ -170,6 +170,15 @@ h2 { text-align: center; font-size: 2rem; color: var(--warm); margin-bottom: 35p
   border-radius: 10px; font-size: 1rem; font-weight: bold;
   cursor: pointer; font-family: inherit;
 }
+.demo-btn {
+  display: block; width: 100%; padding: 11px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white; border: none;
+  border-radius: 10px; font-size: 0.95rem; font-weight: bold;
+  cursor: pointer; font-family: inherit;
+  margin-top: 6px;
+}
+.demo-btn:hover { opacity: 0.9; }
 .submit-btn:hover { background: #6b3f22; }
 .success {
   text-align: center; padding: 30px 20px; display: none;
@@ -356,6 +365,7 @@ function renderCart() {
         <input type="text" id="customerName" placeholder="Ваше ім'я">
         <input type="tel" id="customerPhone" placeholder="Телефон">
         <button class="submit-btn" onclick="submitOrder()">💳 Сплатити через Stripe</button>
+        <button class="demo-btn" onclick="submitDemoOrder()">🎭 Демо-оплата</button>
         <button style="display:block;width:100%;margin-top:8px;padding:10px;background:none;border:none;color:#888;cursor:pointer;font-family:inherit" onclick="showOrderForm=false;renderCart()">← Назад</button>
       </div>
     `;
@@ -430,6 +440,27 @@ async function submitOrder() {
     console.error('Помилка:', err);
     showToast('❌ ' + err.message);
   }
+}
+
+function submitDemoOrder() {
+  const name = document.getElementById('customerName').value.trim();
+  const phone = document.getElementById('customerPhone').value.trim();
+  
+  if (!name || !phone) {
+    showToast('⚠️ Будь ласка, вкажіть імʼя та телефон');
+    return;
+  }
+  
+  // Спрощений список товарів для checkout.html
+  const items = cart.map(x => ({
+    name: x.name,
+    qty: x.qty,
+    price: x.price,
+    emoji: x.emoji
+  }));
+  
+  const params = new URLSearchParams({ items: JSON.stringify(items) });
+  window.location.href = 'checkout.html?' + params.toString();
 }
 
 function toggleCart() {
