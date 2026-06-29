@@ -268,6 +268,12 @@ footer .ai-badge {
 <div class="toast" id="toast"></div>
 
 <script>
+// Перевіряємо, чи Stripe.js завантажився
+if (typeof Stripe === 'undefined') {
+  document.body.innerHTML = '<div style="text-align:center;padding:100px 20px;font-family:sans-serif"><h2>⚠️ Помилка завантаження Stripe</h2><p>Спробуйте оновити сторінку або вимкніть блокувальник реклами.</p></div>';
+  throw new Error('Stripe.js не завантажено');
+}
+
 const stripe = Stripe('pk_test_51TnaEmRyrez9SEApuWztyW3yTJBSmgKN9bqAc7v9uE2Ekp01uKtejXcljABSioAksP0jRh1B1MDdzIompO4PIidS00YVsO4jMp');
 
 const products = [
@@ -392,25 +398,34 @@ function submitOrder() {
     return;
   }
   
+  const btn = document.querySelector('.submit-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Переадресація на Stripe...';
+  
   const lineItems = cart.map(x => ({
     price: x.stripePrice,
     quantity: x.qty
   }));
   
+  console.log('Stripe Checkout — lineItems:', lineItems);
+  
   stripe.redirectToCheckout({
     lineItems: lineItems,
     mode: 'payment',
-    successUrl: window.location.href + '?paid=success',
-    cancelUrl: window.location.href,
-    customerEmail: undefined,
-    metadata: {
-      customer_name: name,
-      customer_phone: phone
-    }
+    successUrl: window.location.origin + window.location.pathname + '?paid=success',
+    cancelUrl: window.location.origin + window.location.pathname,
   }).then(function(result) {
     if (result.error) {
+      btn.disabled = false;
+      btn.textContent = '💳 Сплатити через Stripe';
+      console.error('Stripe error:', result.error);
       showToast('❌ ' + result.error.message);
     }
+  }).catch(function(err) {
+    btn.disabled = false;
+    btn.textContent = '💳 Сплатити через Stripe';
+    console.error('Stripe exception:', err);
+    showToast('❌ Помилка: ' + (err.message || 'невідома помилка'));
   });
 }
 
