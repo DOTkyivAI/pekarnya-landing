@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stripe Worker Test</title>
+<title>Stripe Checkout Test (Vercel)</title>
 <style>
 body { font-family: -apple-system, sans-serif; max-width: 500px; margin: 50px auto; padding: 20px; }
 input, button { display: block; width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; font-size: 16px; font-family: inherit; box-sizing: border-box; }
@@ -17,10 +17,10 @@ button:disabled { background: #999; cursor: not-allowed; }
 </style>
 </head>
 <body>
-<h1>🧪 Тест Worker → Stripe</h1>
+<h1>🧪 Тест Vercel → Stripe</h1>
 
-<p>Worker URL:</p>
-<input id="workerUrl" value="https://your-worker.yoursubdomain.workers.dev" placeholder="https://...">
+<p>API URL (відносний — працює на Vercel):</p>
+<input id="workerUrl" value="/api/checkout" placeholder="/api/checkout" readonly>
 
 <p>Stripe Price ID:</p>
 <input id="priceId" value="price_1TnfOYRyrez9SEApRVf7hJWj" placeholder="price_...">
@@ -42,8 +42,8 @@ async function go() {
   const priceId = document.getElementById('priceId').value.trim();
   const btn = document.getElementById('btn');
   
-  if (!worker || !priceId) {
-    L('❌ Заповни Worker URL та Price ID', 'error');
+  if (!priceId) {
+    L('❌ Введи Stripe Price ID', 'error');
     return;
   }
   
@@ -58,17 +58,14 @@ async function go() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         lineItems: [{ price: priceId, quantity: 1 }],
-        successUrl: location.href + '?paid=ok',
-        cancelUrl: location.href,
       }),
     });
     
     const data = await res.json();
     
     if (res.ok && data.url) {
-      L(`✅ OK — URL: ${data.url.substring(0, 50)}...`, 'success');
-      L('Переадресація через 2 сек...', 'info');
-      setTimeout(() => { window.location.href = data.url; }, 2000);
+      L(`✅ OK — перенаправляю на Stripe...`, 'success');
+      window.location.href = data.url;
     } else {
       L(`❌ HTTP ${res.status}: ${JSON.stringify(data)}`, 'error');
       btn.disabled = false;
@@ -76,7 +73,6 @@ async function go() {
     }
   } catch (err) {
     L(`❌ ${err.message}`, 'error');
-    L('Можливо, Worker не розгорнуто або CORS не налаштовано.', 'info');
     btn.disabled = false;
     btn.textContent = '💳 Сплатити';
   }
