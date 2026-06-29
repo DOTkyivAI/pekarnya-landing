@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Теплий Хліб — Свіжа випічка</title>
-<script src="https://js.stripe.com/v3/"></script>
 <style>
 :root {
   --warm: #8b5e3c;
@@ -268,13 +267,8 @@ footer .ai-badge {
 <div class="toast" id="toast"></div>
 
 <script>
-// Перевіряємо, чи Stripe.js завантажився
-if (typeof Stripe === 'undefined') {
-  document.body.innerHTML = '<div style="text-align:center;padding:100px 20px;font-family:sans-serif"><h2>⚠️ Помилка завантаження Stripe</h2><p>Спробуйте оновити сторінку або вимкніть блокувальник реклами.</p></div>';
-  throw new Error('Stripe.js не завантажено');
-}
-
-const stripe = Stripe('pk_test_51TnaEmRyrez9SEApuWztyW3yTJBSmgKN9bqAc7v9uE2Ekp01uKtejXcljABSioAksP0jRh1B1MDdzIompO4PIidS00YVsO4jMp');
+// ⚠️ ЗАМІНИ на URL твого Cloudflare Worker після розгортання:
+const WORKER_URL = 'https://your-worker.yoursubdomain.workers.dev';
 
 const products = [
   { id: 1, name: "Хліб пшеничний", desc: "Класичний білий хліб на заквасці", price: 45, emoji: "🍞", stripePrice: "price_1TnfOYRyrez9SEApRVf7hJWj" },
@@ -389,7 +383,7 @@ function startOrder() {
   renderCart();
 }
 
-function submitOrder() {
+async function submitOrder() {
   const name = document.getElementById('customerName').value.trim();
   const phone = document.getElementById('customerPhone').value.trim();
   
@@ -400,33 +394,42 @@ function submitOrder() {
   
   const btn = document.querySelector('.submit-btn');
   btn.disabled = true;
-  btn.textContent = '⏳ Переадресація на Stripe...';
+  btn.textContent = '⏳ Створюємо платіж...';
   
   const lineItems = cart.map(x => ({
     price: x.stripePrice,
     quantity: x.qty
   }));
   
-  console.log('Stripe Checkout — lineItems:', lineItems);
-  
-  stripe.redirectToCheckout({
-    lineItems: lineItems,
-    mode: 'payment',
-    successUrl: window.location.origin + window.location.pathname + '?paid=success',
-    cancelUrl: window.location.origin + window.location.pathname,
-  }).then(function(result) {
-    if (result.error) {
-      btn.disabled = false;
-      btn.textContent = '💳 Сплатити через Stripe';
-      console.error('Stripe error:', result.error);
-      showToast('❌ ' + result.error.message);
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        lineItems,
+        successUrl: location.origin + location.pathname + '?paid=success',
+        cancelUrl: location.origin + location.pathname,
+        customerName: name,
+        customerPhone: phone,
+      }),
+    });
+    
+    const data = await res.json();
+    
+    if (!res.ok || data.error) {
+      throw new Error(data.error || 'Помилка сервера');
     }
-  }).catch(function(err) {
+    
+    // Редирект на Stripe Checkout
+    btn.textContent = '⏳ Переадресація на оплату...';
+    window.location.href = data.url;
+    
+  } catch (err) {
     btn.disabled = false;
     btn.textContent = '💳 Сплатити через Stripe';
-    console.error('Stripe exception:', err);
-    showToast('❌ Помилка: ' + (err.message || 'невідома помилка'));
-  });
+    console.error('Помилка:', err);
+    showToast('❌ ' + err.message);
+  }
 }
 
 function toggleCart() {
